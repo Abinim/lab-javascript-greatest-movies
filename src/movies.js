@@ -1,25 +1,97 @@
-// Iteration 1: All directors? - Get the array of all directors.
-// _Bonus_: It seems some of the directors had directed multiple movies so they will pop up multiple times in the array of directors.
-// How could you "clean" a bit this array and make it unified (without duplicates)?
-function getAllDirectors(moviesArray) {}
+function getAllDirectors(movies) {
+  return movies.map(movie => movie.director);
+}
 
-// Iteration 2: Steven Spielberg. The best? - How many drama movies did STEVEN SPIELBERG direct?
-function howManyMovies(moviesArray) {}
+function howManyMovies(movies) {
+  const spielbergDramaMovies = movies.filter(
+    movie =>
+      movie.director === 'Steven Spielberg' && movie.genre.includes('Drama')
+  );
 
-// Iteration 3: All scores average - Get the average of all scores with 2 decimals
-function scoresAverage(moviesArray) {}
+  return spielbergDramaMovies.length;
+}
 
-// Iteration 4: Drama movies - Get the average of Drama Movies
-function dramaMoviesScore(moviesArray) {}
+function scoresAverage(movies) {
+  if (movies.length === 0) return 0;
 
-// Iteration 5: Ordering by year - Order by year, ascending (in growing order)
-function orderByYear(moviesArray) {}
+  const totalScore = movies.reduce((sum, movie) => {
+    return sum + (movie.score || 0);
+  }, 0);
 
-// Iteration 6: Alphabetic Order - Order by title and print the first 20 titles
-function orderAlphabetically(moviesArray) {}
+  const averageScore = totalScore / movies.length;
+  return Number(averageScore.toFixed(2));
+}
 
-// BONUS - Iteration 7: Time Format - Turn duration of the movies from hours to minutes
-function turnHoursToMinutes(moviesArray) {}
+function dramaMoviesScore(movies) {
+  const dramaMovies = movies.filter(movie => movie.genre.includes('Drama'));
 
-// BONUS - Iteration 8: Best yearly score average - Best yearly score average
-function bestYearAvg(moviesArray) {}
+  if (dramaMovies.length === 0) return 0;
+
+  const totalScore = dramaMovies.reduce((sum, movie) => {
+    return sum + (movie.score || 0);
+  }, 0);
+  const averageScore = totalScore / dramaMovies.length;
+  return Number(averageScore.toFixed(2));
+}
+
+function orderByYear(moviesArr) {
+  return moviesArr
+    .map(function (movie) {
+      return movie;
+    })
+    .sort(function (a, b) {
+      if (a.year === b.year) {
+        return a.title.localeCompare(b.title);
+      }
+      return a.year - b.year;
+    });
+}
+function orderAlphabetically(moviesArr) {
+  const onlyTitles = moviesArr.map(function (movie) {
+    return movie.title;
+  });
+  onlyTitles.sort(function (a, b) {
+    return a.localeCompare(b);
+  });
+  const top20 = onlyTitles.splice(0, 20);
+  return top20;
+}
+function turnHoursToMinutes(movies) {
+  return movies.map(movie => {
+    const duration = movie.duration.split(' ');
+    let totalMinutes = 0;
+    for (let time of duration) {
+      if (time.includes('h')) {
+        totalMinutes += parseInt(time) * 60;
+      }
+      if (time.includes('min')) {
+        totalMinutes += parseInt(time);
+      }
+    }
+    return {
+      ...movie,
+      duration: totalMinutes,
+    };
+  });
+}
+
+function bestYearAvg(movies) {
+  if (movies.length === 0) return null;
+
+  const years = [...new Set(movies.map(movie => movie.year))];
+
+  let bestYear = '';
+  let bestAvg = -1;
+
+  for (let year of years) {
+    const moviesOfYear = movies.filter(movie => movie.year === year);
+    const avg = scoresAverage(moviesOfYear);
+
+    if (avg > bestAvg || (avg === bestAvg && year < bestYear)) {
+      bestYear = year;
+      bestAvg = avg;
+    }
+  }
+
+  return `The best year was ${bestYear} with an average score of ${bestAvg}`;
+}
